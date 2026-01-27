@@ -1,0 +1,382 @@
+<Page
+    x:Class="RouterSimChat.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Background="#F3F7FF">
+
+    <Page.Resources>
+        <!-- Brushes -->
+        <SolidColorBrush x:Key="BgBrush" Color="#F3F7FF"/>
+        <SolidColorBrush x:Key="TopBarBrush" Color="#3B73C8"/>
+        <SolidColorBrush x:Key="TopBarBtnBrush" Color="#2D5FA9"/>
+        <SolidColorBrush x:Key="CardBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="CardBorderBrush" Color="#D8E5FF"/>
+        <SolidColorBrush x:Key="SubHeaderBrush" Color="#F6F9FF"/>
+        <SolidColorBrush x:Key="MutedTextBrush" Color="#667085"/>
+        <SolidColorBrush x:Key="OnlineGreenBrush" Color="#46D36A"/>
+        <SolidColorBrush x:Key="DangerRedBrush" Color="#E25555"/>
+        <SolidColorBrush x:Key="AccentBlueBrush" Color="#3B73C8"/>
+        <SolidColorBrush x:Key="BubbleInBrush" Color="#EFF3FA"/>
+
+        <!-- Simple button style (no WinUI 3 custom CornerRadius dependency) -->
+        <Style x:Key="TopIconButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="38"/>
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="{StaticResource TopBarBtnBrush}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+
+        <Style x:Key="SoftIconButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="36"/>
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="Background" Value="#F3F6FF"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+
+        <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+    </Page.Resources>
+
+    <Grid Background="{StaticResource BgBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="56"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- =========================================================
+             TOP BAR
+             ========================================================= -->
+        <Grid Grid.Row="0" Background="{StaticResource TopBarBrush}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="320"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="320"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left: status -->
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0" Spacing="10">
+                <Border Width="26" Height="26" CornerRadius="6" Background="{StaticResource TopBarBtnBrush}" VerticalAlignment="Center">
+                    <TextBlock Text="🛰" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14"/>
+                </Border>
+
+                <Ellipse Width="10" Height="10" Fill="{StaticResource OnlineGreenBrush}" VerticalAlignment="Center"/>
+                <TextBlock Text="Online" Foreground="White" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <!-- Center: title -->
+            <TextBlock Grid.Column="1"
+                       Text="Router-SIM Chat"
+                       Foreground="White"
+                       FontSize="20"
+                       FontWeight="SemiBold"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"/>
+
+            <!-- Right: actions -->
+            <StackPanel Grid.Column="2"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Margin="0,0,12,0"
+                        Spacing="8">
+                <Button Style="{StaticResource TopIconButtonStyle}" Content="🔍" />
+                <Button Style="{StaticResource TopIconButtonStyle}" Content="⚙" />
+                <Button Style="{StaticResource TopIconButtonStyle}" Content="⛶" />
+            </StackPanel>
+        </Grid>
+
+        <!-- =========================================================
+             MAIN LAYOUT (3 columns)
+             ========================================================= -->
+        <Grid Grid.Row="1" Margin="16,12,16,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="320"/>
+                <ColumnDefinition Width="380"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- =======================
+                 LEFT: Router / SIM Selector
+                 ======================= -->
+            <Border Grid.Column="0"
+                    Background="{StaticResource CardBrush}"
+                    BorderBrush="{StaticResource CardBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="14">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="56"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Header -->
+                    <Border Background="{StaticResource SubHeaderBrush}" CornerRadius="14,14,0,0">
+                        <Grid Padding="16,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Text="Router / SIM" VerticalAlignment="Center" Style="{StaticResource SectionTitleStyle}"/>
+
+                            <Button Grid.Column="1" Style="{StaticResource SoftIconButtonStyle}" Content="＋" />
+                        </Grid>
+                    </Border>
+
+                    <!-- Search -->
+                    <Grid Grid.Row="1" Padding="12,10,12,10">
+                        <TextBox PlaceholderText="Search router / SIM..."
+                                 Height="40"
+                                 BorderBrush="{StaticResource CardBorderBrush}"/>
+                    </Grid>
+
+                    <!-- List -->
+                    <ScrollViewer Grid.Row="2" Padding="12">
+                        <StackPanel Spacing="12">
+
+                            <!-- Card: selected -->
+                            <Border CornerRadius="12" BorderBrush="#CFE0FF" BorderThickness="1" Background="#F6FAFF">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <Border Background="{StaticResource AccentBlueBrush}" CornerRadius="12,12,0,0" Padding="12">
+                                        <TextBlock Text="ALLS205RTR01" Foreground="White" FontWeight="SemiBold" FontSize="16"/>
+                                    </Border>
+
+                                    <Grid Grid.Row="1" Padding="12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Spacing="6">
+                                            <TextBlock Text="+61452255433" FontSize="18" FontWeight="SemiBold"/>
+                                            <TextBlock Text="cellular 0/0/0" Foreground="{StaticResource MutedTextBrush}"/>
+                                        </StackPanel>
+
+                                        <Border Grid.Column="1" Width="26" Height="26" CornerRadius="13"
+                                                Background="{StaticResource OnlineGreenBrush}"
+                                                VerticalAlignment="Center">
+                                            <TextBlock Text="✓" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </Grid>
+                                </Grid>
+                            </Border>
+
+                            <!-- Card: offline -->
+                            <Border CornerRadius="12" BorderBrush="#E6EAF2" BorderThickness="1" Background="#FBFCFF">
+                                <StackPanel Padding="12" Spacing="6">
+                                    <TextBlock Text="HQ9700RTR02" FontWeight="SemiBold" FontSize="16"/>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <Ellipse Width="10" Height="10" Fill="{StaticResource DangerRedBrush}" VerticalAlignment="Center"/>
+                                        <TextBlock Text="+61452998012" FontSize="16" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                    <TextBlock Text="cellular 1/0/0" Foreground="{StaticResource MutedTextBrush}"/>
+                                </StackPanel>
+                            </Border>
+
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+
+            <!-- =======================
+                 MIDDLE: Conversations
+                 ======================= -->
+            <Border Grid.Column="1"
+                    Margin="12,0"
+                    Background="{StaticResource CardBrush}"
+                    BorderBrush="{StaticResource CardBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="14">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="56"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Header -->
+                    <Border Background="{StaticResource SubHeaderBrush}" CornerRadius="14,14,0,0">
+                        <Grid Padding="16,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Text="Conversations" VerticalAlignment="Center" Style="{StaticResource SectionTitleStyle}"/>
+                            <Button Grid.Column="1" Style="{StaticResource SoftIconButtonStyle}" Content="⟳" />
+                        </Grid>
+                    </Border>
+
+                    <!-- Search -->
+                    <Grid Grid.Row="1" Padding="12,10,12,10">
+                        <TextBox PlaceholderText="Search number / name..."
+                                 Height="40"
+                                 BorderBrush="{StaticResource CardBorderBrush}"/>
+                    </Grid>
+
+                    <!-- List -->
+                    <ListView Grid.Row="2" Padding="8" SelectionMode="Single">
+                        <ListViewItem>
+                            <Grid Padding="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="52"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Border Width="44" Height="44" CornerRadius="22" Background="#DDEBFF">
+                                    <TextBlock Text="👤" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+
+                                <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="4">
+                                    <TextBlock Text="+61452255433" FontWeight="SemiBold"/>
+                                    <TextBlock Text="sent test from 209 (7)" Foreground="{StaticResource MutedTextBrush}" TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2" HorizontalAlignment="Right" Spacing="6">
+                                    <TextBlock Text="11:38" Foreground="{StaticResource MutedTextBrush}" HorizontalAlignment="Right"/>
+                                    <Border Width="22" Height="22" CornerRadius="11" Background="{StaticResource AccentBlueBrush}" HorizontalAlignment="Right">
+                                        <TextBlock Text="2" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="12"/>
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+                        </ListViewItem>
+
+                        <ListViewItem>
+                            <Grid Padding="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="52"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Border Width="44" Height="44" CornerRadius="22" Background="#DDEBFF">
+                                    <TextBlock Text="J" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                </Border>
+
+                                <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="4">
+                                    <TextBlock Text="+61452299876" FontWeight="SemiBold"/>
+                                    <TextBlock Text="OK received, thank you" Foreground="{StaticResource MutedTextBrush}" TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
+
+                                <TextBlock Grid.Column="2" Text="10:15" Foreground="{StaticResource MutedTextBrush}" VerticalAlignment="Top"/>
+                            </Grid>
+                        </ListViewItem>
+                    </ListView>
+                </Grid>
+            </Border>
+
+            <!-- =======================
+                 RIGHT: Chat Room
+                 ======================= -->
+            <Border Grid.Column="2"
+                    Background="{StaticResource CardBrush}"
+                    BorderBrush="{StaticResource CardBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="14">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="56"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="74"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Chat Header -->
+                    <Grid Grid.Row="0" Background="#FFFFFF" Padding="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button Style="{StaticResource SoftIconButtonStyle}" Content="←"/>
+
+                        <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="+61452255433" FontSize="18" FontWeight="SemiBold"/>
+                            <TextBlock Text="Using: ALLS205RTR01 • +61452255433" Foreground="{StaticResource MutedTextBrush}" FontSize="12"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+                            <Button Style="{StaticResource SoftIconButtonStyle}" Content="📎"/>
+                            <Button Style="{StaticResource SoftIconButtonStyle}" Content="⋯"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Messages -->
+                    <ScrollViewer Grid.Row="1" Padding="16">
+                        <StackPanel Spacing="12">
+
+                            <!-- inbound bubble -->
+                            <StackPanel HorizontalAlignment="Left" MaxWidth="560">
+                                <Border Background="{StaticResource BubbleInBrush}" CornerRadius="16" Padding="12">
+                                    <TextBlock Text="sent test from 209 (7)" TextWrapping="Wrap"/>
+                                </Border>
+                                <TextBlock Text="11:38" Foreground="{StaticResource MutedTextBrush}" FontSize="12" Margin="8,4,0,0"/>
+                            </StackPanel>
+
+                            <!-- outbound bubble -->
+                            <StackPanel HorizontalAlignment="Right" MaxWidth="560">
+                                <Border Background="{StaticResource AccentBlueBrush}" CornerRadius="16" Padding="12">
+                                    <TextBlock Text="Is this agent still online?"
+                                               Foreground="White"
+                                               TextWrapping="Wrap"/>
+                                </Border>
+                                <TextBlock Text="11:42  ✓✓"
+                                           Foreground="{StaticResource MutedTextBrush}"
+                                           FontSize="12"
+                                           HorizontalAlignment="Right"
+                                           Margin="0,4,8,0"/>
+                            </StackPanel>
+
+                            <!-- inbound bubble -->
+                            <StackPanel HorizontalAlignment="Left" MaxWidth="560">
+                                <Border Background="{StaticResource BubbleInBrush}" CornerRadius="16" Padding="12">
+                                    <TextBlock Text="Yes, I'm online" TextWrapping="Wrap"/>
+                                </Border>
+                                <TextBlock Text="11:42" Foreground="{StaticResource MutedTextBrush}" FontSize="12" Margin="8,4,0,0"/>
+                            </StackPanel>
+
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- Composer -->
+                    <Grid Grid.Row="2" Padding="14">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="140"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button Width="44" Height="44" Background="#F3F6FF" BorderThickness="0" Content="＋"/>
+
+                        <TextBox Grid.Column="1"
+                                 PlaceholderText="Type a message..."
+                                 Height="44"
+                                 Margin="10,0,0,0"
+                                 VerticalAlignment="Center"
+                                 BorderBrush="{StaticResource CardBorderBrush}"/>
+
+                        <Button Grid.Column="2"
+                                Content="Send"
+                                Height="44"
+                                Margin="10,0,0,0"
+                                Background="{StaticResource AccentBlueBrush}"
+                                Foreground="White"
+                                BorderThickness="0"/>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Page>

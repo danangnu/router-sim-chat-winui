@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "RouterSimChat (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "RouterSimChat (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

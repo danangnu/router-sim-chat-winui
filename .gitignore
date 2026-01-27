@@ -1,0 +1,126 @@
+## --- Visual Studio / .NET / WinUI ---
+
+# Build results
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+artifacts/
+*.obj
+*.pdb
+*.idb
+*.ilk
+*.iobj
+*.ipdb
+*.rsp
+*.sbr
+*.tlh
+*.tli
+
+# VS cache/metadata
+.vs/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# NuGet
+*.nupkg
+*.snupkg
+# (uncomment if you commit lock files)
+# packages/
+# **/packages/*
+# !**/packages/build/
+# !**/packages/repositories.config
+.nuget/
+# ignore global-packages cache
+# %userprofile%\.nuget\packages is user-scoped, not in repo
+
+# MSBuild logs
+msbuild.log
+msbuild.err
+msbuild.wrn
+
+# Test results / coverage
+[Tt]est[Rr]esults/
+[Bb]uild[Ll]og.*
+*.coverage
+*.coveragexml
+*.trx
+*.cov
+.coverage/
+.vscoverage*
+
+# Publish / ClickOnce / Setup
+publish/
+*.[Pp]ublish.xml
+*.ClickOnce/
+**/app.publish/
+
+# Windows App SDK / MSIX App Packaging
+AppPackages/
+BundleArtifacts/
+node_modules/@microsoft/windows-app-sdk*
+*.msix
+*.msixbundle
+*.appx
+*.appxbundle
+*.appxupload
+*.appxsym
+# Packaging intermediate
+**/obj/**/WinUIApp*.pri
+**/obj/**/XamlTypeInfo.g.*
+**/obj/**/Layout.res
+
+# WinUI/Generated
+**/obj/**/g/**/*
+**/obj/**/generated/**/*
+*.g.cs
+*.g.i.cs
+
+# Entity Framework
+*.dbmdl
+*.jfm
+Migrations/**/__EFMigrationsHistory*
+
+# Resharper / Rider / CodeRush
+_ReSharper*/
+*.DotSettings.user
+.idea/
+
+# StyleCop
+StyleCop.Cache
+
+# Azure
+PublishScripts/
+*.azurePubxml
+*.pubxml
+*.pubxml.user
+# Service fabric
+*.sfproj
+
+# VS profiler
+*.psess
+*.vsp
+*.vspx
+*.sap
+
+# T4
+*.Transform.cs
+*.ttinclude
+*.tt.temp
+
+# Others
+*.tmp
+*.temp
+~$*
+*.orig
+*/.DS_Store
+Thumbs.db
+
+# Local tools/settings
+*.local.json
+secrets.json
+
+#Installer exe
+SentonVpnSetup.exe
