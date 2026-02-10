@@ -132,45 +132,37 @@
                     <!-- Search -->
                     <Grid Grid.Row="1" Padding="12,10,12,10">
                         <TextBox PlaceholderText="Search router / SIM..."
-                                 Height="40"
-                                 BorderBrush="{StaticResource CardBorderBrush}"/>
+                            Text="{Binding RouterSearch, Mode=TwoWay}"
+                            Height="40"
+                            BorderBrush="{StaticResource CardBorderBrush}"/>
                     </Grid>
 
                     <!-- List -->
                     <ScrollViewer Grid.Row="2" Padding="12">
                         <StackPanel Spacing="12">
 
-                            <!-- Card: selected -->
-                            <Border CornerRadius="12" BorderBrush="#CFE0FF" BorderThickness="1" Background="#F6FAFF">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                    </Grid.RowDefinitions>
-
-                                    <Border Background="{StaticResource AccentBlueBrush}" CornerRadius="12,12,0,0" Padding="12">
-                                        <TextBlock Text="ALLS205RTR01" Foreground="White" FontWeight="SemiBold" FontSize="16"/>
-                                    </Border>
-
-                                    <Grid Grid.Row="1" Padding="12">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-
-                                        <StackPanel Spacing="6">
-                                            <TextBlock Text="+61452255433" FontSize="18" FontWeight="SemiBold"/>
-                                            <TextBlock Text="cellular 0/0/0" Foreground="{StaticResource MutedTextBrush}"/>
-                                        </StackPanel>
-
-                                        <Border Grid.Column="1" Width="26" Height="26" CornerRadius="13"
-                                                Background="{StaticResource OnlineGreenBrush}"
-                                                VerticalAlignment="Center">
-                                            <TextBlock Text="✓" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <!-- List -->
+                            <ListView Grid.Row="2"
+                                Padding="12"
+                                ItemsSource="{Binding Routers}"
+                                SelectedItem="{Binding SelectedRouter, Mode=TwoWay}">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border CornerRadius="12"
+                                            BorderBrush="#E6EAF2"
+                                            BorderThickness="1"
+                                            Background="#FBFCFF"
+                                            Margin="0,0,0,12">
+                                            <StackPanel Padding="12" Spacing="6">
+                                                <TextBlock Text="{Binding Hostname}" FontWeight="SemiBold" FontSize="16"/>
+                                                <TextBlock Text="{Binding RouterName}" Foreground="{StaticResource MutedTextBrush}"/>
+                                                <TextBlock Text="{Binding Interface}" Foreground="{StaticResource MutedTextBrush}"/>
+                                                <TextBlock Text="{Binding Ip}" Foreground="{StaticResource MutedTextBrush}"/>
+                                            </StackPanel>
                                         </Border>
-                                    </Grid>
-                                </Grid>
-                            </Border>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
 
                             <!-- Card: offline -->
                             <Border CornerRadius="12" BorderBrush="#E6EAF2" BorderThickness="1" Background="#FBFCFF">
@@ -221,58 +213,54 @@
                     <!-- Search -->
                     <Grid Grid.Row="1" Padding="12,10,12,10">
                         <TextBox PlaceholderText="Search number / name..."
-                                 Height="40"
-                                 BorderBrush="{StaticResource CardBorderBrush}"/>
+                            Text="{Binding ConversationSearch, Mode=TwoWay}"
+                            Height="40"
+                            BorderBrush="{StaticResource CardBorderBrush}"/>
                     </Grid>
 
                     <!-- List -->
-                    <ListView Grid.Row="2" Padding="8" SelectionMode="Single">
-                        <ListViewItem>
-                            <Grid Padding="10">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="52"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
+                    <ListView Grid.Row="2"
+                        Padding="8"
+                        ItemsSource="{Binding Conversations}"
+                        SelectedItem="{Binding SelectedConversation, Mode=TwoWay}"
+                        SelectionMode="Single">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="52"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
 
-                                <Border Width="44" Height="44" CornerRadius="22" Background="#DDEBFF">
-                                    <TextBlock Text="👤" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
-
-                                <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="4">
-                                    <TextBlock Text="+61452255433" FontWeight="SemiBold"/>
-                                    <TextBlock Text="sent test from 209 (7)" Foreground="{StaticResource MutedTextBrush}" TextTrimming="CharacterEllipsis"/>
-                                </StackPanel>
-
-                                <StackPanel Grid.Column="2" HorizontalAlignment="Right" Spacing="6">
-                                    <TextBlock Text="11:38" Foreground="{StaticResource MutedTextBrush}" HorizontalAlignment="Right"/>
-                                    <Border Width="22" Height="22" CornerRadius="11" Background="{StaticResource AccentBlueBrush}" HorizontalAlignment="Right">
-                                        <TextBlock Text="2" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="12"/>
+                                    <Border Width="44" Height="44" CornerRadius="22" Background="#DDEBFF">
+                                        <TextBlock Text="👤" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                     </Border>
-                                </StackPanel>
-                            </Grid>
-                        </ListViewItem>
 
-                        <ListViewItem>
-                            <Grid Padding="10">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="52"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="4">
+                                        <TextBlock Text="{Binding Peer}" FontWeight="SemiBold"/>
+                                        <TextBlock Text="{Binding LastMessage}"
+                                            Foreground="{StaticResource MutedTextBrush}"
+                                            TextTrimming="CharacterEllipsis"/>
+                                    </StackPanel>
 
-                                <Border Width="44" Height="44" CornerRadius="22" Background="#DDEBFF">
-                                    <TextBlock Text="J" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold"/>
-                                </Border>
-
-                                <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="4">
-                                    <TextBlock Text="+61452299876" FontWeight="SemiBold"/>
-                                    <TextBlock Text="OK received, thank you" Foreground="{StaticResource MutedTextBrush}" TextTrimming="CharacterEllipsis"/>
-                                </StackPanel>
-
-                                <TextBlock Grid.Column="2" Text="10:15" Foreground="{StaticResource MutedTextBrush}" VerticalAlignment="Top"/>
-                            </Grid>
-                        </ListViewItem>
+                                    <StackPanel Grid.Column="2" HorizontalAlignment="Right" Spacing="6">
+                                        <TextBlock Text="{Binding TimeShort}"
+                               Foreground="{StaticResource MutedTextBrush}"
+                               HorizontalAlignment="Right"/>
+                                        <Border Width="22" Height="22" CornerRadius="11"
+                            Background="{StaticResource AccentBlueBrush}"
+                            HorizontalAlignment="Right">
+                                            <TextBlock Text="{Binding MessageCount}"
+                                   Foreground="White"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontSize="12"/>
+                                        </Border>
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
                     </ListView>
                 </Grid>
             </Border>
@@ -303,8 +291,9 @@
                         <Button Style="{StaticResource SoftIconButtonStyle}" Content="←"/>
 
                         <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
-                            <TextBlock Text="+61452255433" FontSize="18" FontWeight="SemiBold"/>
-                            <TextBlock Text="Using: ALLS205RTR01 • +61452255433" Foreground="{StaticResource MutedTextBrush}" FontSize="12"/>
+                            <TextBlock Text="{Binding SelectedConversation.Peer}" FontSize="18" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding SelectedRouter.Hostname}"
+                                Foreground="{StaticResource MutedTextBrush}" FontSize="12"/>
                         </StackPanel>
 
                         <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
@@ -315,39 +304,22 @@
 
                     <!-- Messages -->
                     <ScrollViewer Grid.Row="1" Padding="16">
-                        <StackPanel Spacing="12">
-
-                            <!-- inbound bubble -->
-                            <StackPanel HorizontalAlignment="Left" MaxWidth="560">
-                                <Border Background="{StaticResource BubbleInBrush}" CornerRadius="16" Padding="12">
-                                    <TextBlock Text="sent test from 209 (7)" TextWrapping="Wrap"/>
-                                </Border>
-                                <TextBlock Text="11:38" Foreground="{StaticResource MutedTextBrush}" FontSize="12" Margin="8,4,0,0"/>
-                            </StackPanel>
-
-                            <!-- outbound bubble -->
-                            <StackPanel HorizontalAlignment="Right" MaxWidth="560">
-                                <Border Background="{StaticResource AccentBlueBrush}" CornerRadius="16" Padding="12">
-                                    <TextBlock Text="Is this agent still online?"
-                                               Foreground="White"
-                                               TextWrapping="Wrap"/>
-                                </Border>
-                                <TextBlock Text="11:42  ✓✓"
-                                           Foreground="{StaticResource MutedTextBrush}"
-                                           FontSize="12"
-                                           HorizontalAlignment="Right"
-                                           Margin="0,4,8,0"/>
-                            </StackPanel>
-
-                            <!-- inbound bubble -->
-                            <StackPanel HorizontalAlignment="Left" MaxWidth="560">
-                                <Border Background="{StaticResource BubbleInBrush}" CornerRadius="16" Padding="12">
-                                    <TextBlock Text="Yes, I'm online" TextWrapping="Wrap"/>
-                                </Border>
-                                <TextBlock Text="11:42" Foreground="{StaticResource MutedTextBrush}" FontSize="12" Margin="8,4,0,0"/>
-                            </StackPanel>
-
-                        </StackPanel>
+                        <ItemsControl ItemsSource="{Binding Messages}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <!-- For now all inbound; later we can switch alignment with IsOutbound -->
+                                    <StackPanel HorizontalAlignment="Left" MaxWidth="560" Margin="0,0,0,12">
+                                        <Border Background="{StaticResource BubbleInBrush}" CornerRadius="16" Padding="12">
+                                            <TextBlock Text="{Binding Body}" TextWrapping="Wrap"/>
+                                        </Border>
+                                        <TextBlock Text="{Binding TimeShort}"
+                               Foreground="{StaticResource MutedTextBrush}"
+                               FontSize="12"
+                               Margin="8,4,0,0"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </ScrollViewer>
 
                     <!-- Composer -->
