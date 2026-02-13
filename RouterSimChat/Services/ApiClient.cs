@@ -1,9 +1,10 @@
-﻿using System;
+﻿using RouterSimChat.Models;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using RouterSimChat.Models;
 
 namespace RouterSimChat.Services
 {
@@ -11,6 +12,7 @@ namespace RouterSimChat.Services
     {
         private readonly HttpClient _http;
         private readonly JsonSerializerOptions _json;
+        private readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
 
         public ApiClient(string baseUrl)
         {
@@ -61,18 +63,63 @@ namespace RouterSimChat.Services
             return JsonSerializer.Deserialize<List<ConversationItem>>(json, _json) ?? new List<ConversationItem>();
         }
 
-        public async Task<List<MessageItem>> GetMessagesAsync(int routerId, string slot, string peer, int limit)
+        public async Task<List<MessageItem>> GetMessagesAsync(
+            int routerId,
+            string slot,
+            string peer,
+            int limit = 50,
+            string? sinceTs = null)
         {
-            var url =
-                $"api/messages?router_id={routerId}" +
-                $"&slot={Uri.EscapeDataString(slot)}" +
-                $"&peer={Uri.EscapeDataString(peer)}" +
-                $"&limit={limit}";
+            var url = new StringBuilder();
+            url.Append($"/api/messages?router_id={routerId}");
+            url.Append($"&slot={Uri.EscapeDataString(slot)}");
+            url.Append($"&peer={Uri.EscapeDataString(peer)}");
+            url.Append($"&limit={limit}");
 
-            var json = await _http.GetStringAsync(url);
-            System.Diagnostics.Trace.WriteLine($"[API] GET {url} -> {json}");
+            if (!string.IsNullOrEmpty(sinceTs))
+            {
+                url.Append($"&since_ts={Uri.EscapeDataString(sinceTs)}");
+            }
 
-            return JsonSerializer.Deserialize<List<MessageItem>>(json, _json) ?? new List<MessageItem>();
+            using var resp = await _http.GetAsync(url.ToString());
+            resp.EnsureSuccessStatusCode();
+
+            var json = await resp.Content.ReadAsStringAsync();
+            var items = JsonSerializer.Deserialize<List<MessageItem>>(json, _jsonOptions)
+                        ?? new List<MessageItem>();
+
+            return items;
         }
+
+        public async Task<SendSmsResponse> SendSmsAsync(int routerId, string slot, string peer, string body)
+        {
+            var payload = new
+            {
+                router_id = routerId,
+                slot,
+                peer,
+                body
+            };
+
+            var json = JsonSerializer.Serialize(payload, _jsonOptions);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var resp = await _http.PostAsync("/api/send-sms", content);
+            resp.EnsureSuccessStatusCode();
+
+            await using var stream = await resp.Content.ReadAsStreamAsync();
+            var result = await JsonSerializer.DeserializeAsync<SendSmsResponse>(stream, _jsonOptions)
+                         ?? new SendSmsResponse { Ok = false };
+            return result;
+        }
+
+        public async Task<OutboxStatusResponse> GetOutboxStatusAsync(long outboxId)
+        {
+            var resp = await _http.GetAsync($"/api/outbox-status/{outboxId}");
+            resp.EnsureSuccessStatusCode();
+
+            await using var stream = await resp.Content.ReadAsStreamAsync();
+            return (await JsonSerializer.DeserializeAsync<OutboxStatusResponse>(stream, _jsonOptions))!;
+        }
+
     }
 }

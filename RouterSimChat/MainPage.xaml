@@ -2,6 +2,10 @@
     x:Class="RouterSimChat.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:RouterSimChat"
+    xmlns:vm="using:RouterSimChat.ViewModels"
+    xmlns:models="using:RouterSimChat.Models"
+    x:DataType="local:MainPage"
     Background="#F3F7FF">
 
     <Page.Resources>
@@ -40,6 +44,53 @@
             <Setter Property="FontSize" Value="16"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
         </Style>
+        <!-- ========== MESSAGE TEMPLATES ========== -->
+        <DataTemplate x:Key="InboundMessageTemplate"
+                  x:DataType="models:MessageItem">
+            <StackPanel HorizontalAlignment="Left" MaxWidth="560" Margin="0,0,0,12">
+                <Border Background="{StaticResource BubbleInBrush}"
+                    CornerRadius="16"
+                    Padding="12">
+                    <TextBlock Text="{x:Bind Body}" TextWrapping="Wrap"/>
+                </Border>
+                <TextBlock Text="{x:Bind TimeShort}"
+                       Foreground="{StaticResource MutedTextBrush}"
+                       FontSize="12"
+                       Margin="8,4,0,0"/>
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate x:Key="OutboundMessageTemplate"
+              x:DataType="models:MessageItem">
+            <StackPanel HorizontalAlignment="Right" MaxWidth="560" Margin="0,0,0,12">
+                <Border Background="{StaticResource AccentBlueBrush}"
+                CornerRadius="16"
+                Padding="12">
+                    <TextBlock Text="{x:Bind Body}"
+                       TextWrapping="Wrap"
+                       Foreground="White"/>
+                </Border>
+
+                <!-- time + failure label -->
+                <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,4,8,0"
+                    Spacing="6">
+                    <TextBlock Text="{x:Bind TimeShort}"
+                       Foreground="{StaticResource MutedTextBrush}"
+                       FontSize="12"/>
+
+                    <!-- Only non-empty when failed -->
+                    <TextBlock Text="{x:Bind StatusLabel}"
+                       Foreground="{StaticResource DangerRedBrush}"
+                       FontSize="12"/>
+                </StackPanel>
+            </StackPanel>
+        </DataTemplate>
+
+        <local:MessageTemplateSelector x:Key="MessageTemplateSelector"
+                                   InboundTemplate="{StaticResource InboundMessageTemplate}"
+                                   OutboundTemplate="{StaticResource OutboundMessageTemplate}" />
     </Page.Resources>
 
     <Grid Background="{StaticResource BgBrush}">
@@ -144,20 +195,20 @@
                             <!-- List -->
                             <ListView Grid.Row="2"
                                 Padding="12"
-                                ItemsSource="{Binding Routers}"
-                                SelectedItem="{Binding SelectedRouter, Mode=TwoWay}">
+                                ItemsSource="{x:Bind ViewModel.Routers, Mode=OneWay}"
+                                SelectedItem="{x:Bind ViewModel.SelectedRouter, Mode=TwoWay}">
                                 <ListView.ItemTemplate>
-                                    <DataTemplate>
+                                    <DataTemplate x:DataType="models:RouterIdentity">
                                         <Border CornerRadius="12"
                                             BorderBrush="#E6EAF2"
                                             BorderThickness="1"
                                             Background="#FBFCFF"
                                             Margin="0,0,0,12">
                                             <StackPanel Padding="12" Spacing="6">
-                                                <TextBlock Text="{Binding Hostname}" FontWeight="SemiBold" FontSize="16"/>
-                                                <TextBlock Text="{Binding RouterName}" Foreground="{StaticResource MutedTextBrush}"/>
-                                                <TextBlock Text="{Binding Interface}" Foreground="{StaticResource MutedTextBrush}"/>
-                                                <TextBlock Text="{Binding Ip}" Foreground="{StaticResource MutedTextBrush}"/>
+                                                <TextBlock Text="{x:Bind Hostname}" FontWeight="SemiBold" FontSize="16"/>
+                                                <TextBlock Text="{x:Bind RouterName}" Foreground="{StaticResource MutedTextBrush}"/>
+                                                <TextBlock Text="{x:Bind Interface}" Foreground="{StaticResource MutedTextBrush}"/>
+                                                <TextBlock Text="{x:Bind Ip}" Foreground="{StaticResource MutedTextBrush}"/>
                                             </StackPanel>
                                         </Border>
                                     </DataTemplate>
@@ -213,7 +264,7 @@
                     <!-- Search -->
                     <Grid Grid.Row="1" Padding="12,10,12,10">
                         <TextBox PlaceholderText="Search number / name..."
-                            Text="{Binding ConversationSearch, Mode=TwoWay}"
+                            Text="{x:Bind ViewModel.ConversationSearch, Mode=TwoWay}"
                             Height="40"
                             BorderBrush="{StaticResource CardBorderBrush}"/>
                     </Grid>
@@ -221,11 +272,12 @@
                     <!-- List -->
                     <ListView Grid.Row="2"
                         Padding="8"
-                        ItemsSource="{Binding Conversations}"
-                        SelectedItem="{Binding SelectedConversation, Mode=TwoWay}"
+                        ItemsSource="{x:Bind ViewModel.Conversations, Mode=OneWay}"
+                        SelectedItem="{x:Bind ViewModel.SelectedConversation, Mode=TwoWay}"
                         SelectionMode="Single">
                         <ListView.ItemTemplate>
-                            <DataTemplate>
+                            <DataTemplate x:DataType="models:ConversationItem">
+                                <!-- same layout, but use x:Bind -->
                                 <Grid Padding="10">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="52"/>
@@ -238,20 +290,20 @@
                                     </Border>
 
                                     <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="4">
-                                        <TextBlock Text="{Binding Peer}" FontWeight="SemiBold"/>
-                                        <TextBlock Text="{Binding LastMessage}"
-                                            Foreground="{StaticResource MutedTextBrush}"
-                                            TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="{x:Bind Peer}" FontWeight="SemiBold"/>
+                                        <TextBlock Text="{x:Bind LastMessage}"
+                               Foreground="{StaticResource MutedTextBrush}"
+                               TextTrimming="CharacterEllipsis"/>
                                     </StackPanel>
 
                                     <StackPanel Grid.Column="2" HorizontalAlignment="Right" Spacing="6">
-                                        <TextBlock Text="{Binding TimeShort}"
+                                        <TextBlock Text="{x:Bind TimeShort}"
                                Foreground="{StaticResource MutedTextBrush}"
                                HorizontalAlignment="Right"/>
                                         <Border Width="22" Height="22" CornerRadius="11"
                             Background="{StaticResource AccentBlueBrush}"
                             HorizontalAlignment="Right">
-                                            <TextBlock Text="{Binding MessageCount}"
+                                            <TextBlock Text="{x:Bind MessageCount}"
                                    Foreground="White"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
@@ -291,8 +343,9 @@
                         <Button Style="{StaticResource SoftIconButtonStyle}" Content="←"/>
 
                         <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
-                            <TextBlock Text="{Binding SelectedConversation.Peer}" FontSize="18" FontWeight="SemiBold"/>
-                            <TextBlock Text="{Binding SelectedRouter.Hostname}"
+                            <TextBlock Text="{x:Bind ViewModel.SelectedConversation.Peer, Mode=OneWay}"
+                                FontSize="18" FontWeight="SemiBold"/>
+                            <TextBlock Text="{x:Bind ViewModel.SelectedRouter.Hostname, Mode=OneWay}"
                                 Foreground="{StaticResource MutedTextBrush}" FontSize="12"/>
                         </StackPanel>
 
@@ -304,22 +357,8 @@
 
                     <!-- Messages -->
                     <ScrollViewer Grid.Row="1" Padding="16">
-                        <ItemsControl ItemsSource="{Binding Messages}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <!-- For now all inbound; later we can switch alignment with IsOutbound -->
-                                    <StackPanel HorizontalAlignment="Left" MaxWidth="560" Margin="0,0,0,12">
-                                        <Border Background="{StaticResource BubbleInBrush}" CornerRadius="16" Padding="12">
-                                            <TextBlock Text="{Binding Body}" TextWrapping="Wrap"/>
-                                        </Border>
-                                        <TextBlock Text="{Binding TimeShort}"
-                               Foreground="{StaticResource MutedTextBrush}"
-                               FontSize="12"
-                               Margin="8,4,0,0"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                        <ItemsControl ItemsSource="{x:Bind ViewModel.Messages, Mode=OneWay}"
+                            ItemTemplateSelector="{StaticResource MessageTemplateSelector}" />
                     </ScrollViewer>
 
                     <!-- Composer -->
@@ -330,22 +369,27 @@
                             <ColumnDefinition Width="140"/>
                         </Grid.ColumnDefinitions>
 
-                        <Button Width="44" Height="44" Background="#F3F6FF" BorderThickness="0" Content="＋"/>
+                        <Button Width="44" Height="44"
+                            Background="#F3F6FF"
+                            BorderThickness="0"
+                            Content="＋"/>
 
                         <TextBox Grid.Column="1"
-                                 PlaceholderText="Type a message..."
-                                 Height="44"
-                                 Margin="10,0,0,0"
-                                 VerticalAlignment="Center"
-                                 BorderBrush="{StaticResource CardBorderBrush}"/>
+                            PlaceholderText="Type a message..."
+                            Text="{x:Bind ViewModel.NewMessageBody, Mode=TwoWay}"
+                            Height="44"
+                            Margin="10,0,0,0"
+                            VerticalAlignment="Center"
+                            BorderBrush="{StaticResource CardBorderBrush}"/>
 
                         <Button Grid.Column="2"
-                                Content="Send"
-                                Height="44"
-                                Margin="10,0,0,0"
-                                Background="{StaticResource AccentBlueBrush}"
-                                Foreground="White"
-                                BorderThickness="0"/>
+                            Content="Send"
+                            Height="44"
+                            Margin="10,0,0,0"
+                            Background="{StaticResource AccentBlueBrush}"
+                            Foreground="White"
+                            BorderThickness="0"
+                            Click="Send_Click"/>
                     </Grid>
                 </Grid>
             </Border>

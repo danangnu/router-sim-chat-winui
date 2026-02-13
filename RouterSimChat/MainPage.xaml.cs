@@ -1,4 +1,4 @@
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using RouterSimChat.ViewModels;
 
@@ -6,25 +6,38 @@ namespace RouterSimChat
 {
     public sealed partial class MainPage : Page
     {
-        public MainViewModel ViewModel { get; }
+        // Initialize the VM inline – it is NEVER null after this point
+        public MainViewModel ViewModel { get; } =
+            new MainViewModel("http://127.0.0.1:8080");
 
         public MainPage()
         {
             this.InitializeComponent();
 
-            ViewModel = new MainViewModel(
-                ui: Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread(),
-                baseUrl: "http://127.0.0.1:8080"
-            );
+            // ❌ REMOVE this – we won't use DataContext for bindings anymore
+            // DataContext = ViewModel;
 
-            DataContext = ViewModel;
+            // Kick async init when page is loaded
+            Loaded += MainPage_Loaded;
+        }
 
-            _ = ViewModel.InitializeAsync();
+        private async void MainPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            Loaded -= MainPage_Loaded;
+            await ViewModel.InitializeAsync();
         }
 
         private void Close_Click(object sender, RoutedEventArgs e)
         {
             (Application.Current as App)?.Exit();
+        }
+
+        private async void Send_Click(object sender, RoutedEventArgs e)
+        {
+            if (ViewModel != null)
+            {
+                await ViewModel.SendAsync();
+            }
         }
     }
 }
