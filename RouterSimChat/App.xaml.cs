@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
+﻿using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -11,6 +7,11 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Shapes;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
@@ -26,8 +27,8 @@ namespace RouterSimChat
     /// </summary>
     public partial class App : Application
     {
-        private Window? _window;
-
+        //private Window? _window;
+        public static MainWindow MainAppWindow { get; private set; }
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -35,6 +36,23 @@ namespace RouterSimChat
         public App()
         {
             InitializeComponent();
+            ToastNotificationManagerCompat.OnActivated += toastArgs =>
+            {
+                var args = ToastArguments.Parse(toastArgs.Argument);
+
+                if (args["action"] == "openChat")
+                {
+                    string sender = args["sender"];
+
+                    EnsureWindow();
+
+                    MainAppWindow.DispatcherQueue.TryEnqueue(async () =>
+                    {
+                        await MainAppWindow.OpenChat(sender);
+                    });
+                }
+            };
+
         }
 
         /// <summary>
@@ -43,8 +61,21 @@ namespace RouterSimChat
         /// <param name="args">Details about the launch request and process.</param>
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
-            _window = new MainWindow();
-            _window.Activate();
+            //_window = new MainWindow();
+            //_window.Activate();
+            //MainAppWindow = new MainWindow();
+            //MainAppWindow.Activate();
+            EnsureWindow();
         }
+
+        private void EnsureWindow()
+        {
+            if (MainAppWindow == null)
+            {
+                MainAppWindow = new MainWindow();
+                MainAppWindow.Activate();
+            }
+        }
+
     }
 }

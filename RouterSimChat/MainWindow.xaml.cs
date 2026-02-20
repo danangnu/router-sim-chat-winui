@@ -2,6 +2,7 @@ using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using System.Threading.Tasks;
 using Windows.Graphics;
 using WinRT.Interop;
 
@@ -30,6 +31,23 @@ namespace RouterSimChat
 
             // Resize
             appWindow.Resize(new SizeInt32(width, height));
+        }
+        public async Task OpenChat(string sender)
+        {
+            if (Content is Frame frame)
+            {
+                if (frame.Content is not MainPage)
+                {
+                    frame.Navigate(typeof(MainPage));
+                }
+
+                if (frame.Content is MainPage page)
+                {
+                    await page.OpenChatFromToast(sender);
+                }
+            }
+
+            this.Activate();
         }
     }
 }

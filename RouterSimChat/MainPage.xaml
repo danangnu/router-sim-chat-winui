@@ -2,6 +2,7 @@
     x:Class="RouterSimChat.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:RouterSimChat"
     Background="#F3F7FF">
 
     <Page.Resources>
@@ -28,6 +29,15 @@
             <Setter Property="Padding" Value="0"/>
         </Style>
 
+        <Style x:Key="SoftIconButtonStyleAuto" TargetType="Button">
+            <Setter Property="Width" Value="200"/>
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="Background" Value="{StaticResource TopBarBtnBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+
         <Style x:Key="SoftIconButtonStyle" TargetType="Button">
             <Setter Property="Width" Value="36"/>
             <Setter Property="Height" Value="34"/>
@@ -40,8 +50,134 @@
             <Setter Property="FontSize" Value="16"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
         </Style>
-    </Page.Resources>
+    <!--</Page.Resources>
+    
+    <Page.Resources>-->
 
+        <!-- Inbound -->
+        <DataTemplate x:Key="InboundTemplate" x:DataType="local:ChatMessage">
+            <StackPanel HorizontalAlignment="Left" MaxWidth="560">
+                <Border Background="{StaticResource BubbleInBrush}"
+                    CornerRadius="16"
+                    Padding="12">
+                    <TextBlock Text="{x:Bind Message}" TextWrapping="Wrap"/>
+                </Border>
+                <TextBlock Text="{x:Bind sortTime}"
+                       Foreground="{StaticResource MutedTextBrush}"
+                       FontSize="12"
+                       Margin="8,4,0,0"/>
+            </StackPanel>
+        </DataTemplate>
+
+        <!-- Outbound -->
+        <DataTemplate x:Key="OutboundTemplate" x:DataType="local:ChatMessage">
+            <StackPanel HorizontalAlignment="Right" MaxWidth="560">
+                <Border Background="{StaticResource AccentBlueBrush}"
+                    CornerRadius="16"
+                    Padding="12">
+                    <TextBlock Text="{x:Bind Message}"
+                           Foreground="White"
+                           TextWrapping="Wrap"/>
+                </Border>
+                <StackPanel Orientation="Horizontal"
+            HorizontalAlignment="Right"
+            Margin="0,4,8,0"
+            Spacing="6">
+
+                    <TextBlock Text="{x:Bind sortTime}"
+                       Foreground="{StaticResource MutedTextBrush}"
+                       FontSize="12"/>
+                    <TextBlock Text="{x:Bind StatusIcon}"
+                        FontSize="12"/>
+                </StackPanel>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="DateTemplate" x:DataType="local:ChatDateSeparator">
+            <TextBlock Text="{x:Bind DateHeaderText}"
+           HorizontalAlignment="Center"
+           Margin="0,12"
+           Foreground="{StaticResource MutedTextBrush}"
+           FontWeight="SemiBold"/>
+        </DataTemplate>
+        <!-- Selector -->
+        <local:ChatBubbleTemplateSelector
+        x:Key="ChatBubbleTemplateSelector"
+        InboundTemplate="{StaticResource InboundTemplate}"
+        OutboundTemplate="{StaticResource OutboundTemplate}" 
+        DateTemplate ="{StaticResource DateTemplate}"/>
+
+
+        <!-- Template Chat -->
+        <DataTemplate x:Key="ChatTemplate"
+                  x:DataType="local:ChatLastMessage">
+            <Grid Padding="10" Background="{x:Bind CardBrush, Mode=OneWay}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="52"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Width="44" Height="44" CornerRadius="22" Background="#DDEBFF">
+                    <TextBlock Text="👤" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+
+                <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="4">
+                    <TextBlock Text="{x:Bind name, Mode=OneWay}" FontWeight="SemiBold"/>
+                    <TextBlock Text="{x:Bind message, Mode=OneWay}"
+                           Foreground="{StaticResource MutedTextBrush}"
+                           TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" HorizontalAlignment="Right" Spacing="6">
+                    <TextBlock Text="{x:Bind DisplayTime, Mode=OneWay}"
+                           Foreground="{StaticResource MutedTextBrush}"/>
+                    <TextBlock HorizontalAlignment="Right" Text="{x:Bind StatusIcon, Mode=OneWay}"
+                    Foreground="{StaticResource MutedTextBrush}"
+                               Visibility="{x:Bind isOutboxVisibility, Mode=OneWay}" />
+
+                    <Border Width="22"
+                        Height="22"
+                        CornerRadius="11"
+                        Background="{StaticResource AccentBlueBrush}"
+                        Visibility="{x:Bind UnreadVisibility, Mode=OneWay}">
+                        <TextBlock Text="{x:Bind unread_count, Mode=OneWay}"
+                               Foreground="White"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               FontSize="12"/>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <!-- Template Contact -->
+        <DataTemplate x:Key="ContactTemplate"
+                  x:DataType="local:Contact">
+            <Grid Padding="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="52"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Width="44" Height="44" CornerRadius="22" Background="#E6F4EA">
+                    <TextBlock Text="📞"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"/>
+                </Border>
+
+                <StackPanel Grid.Column="1" Margin="12,0,0,0">
+                    <TextBlock Text="{x:Bind name}"
+                           FontWeight="SemiBold"/>
+                    <TextBlock Text="{x:Bind contact}"
+                           Opacity="0.6"/>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+        <local:SearchTemplateSelector
+        x:Key="SearchSelector"
+        ChatTemplate="{StaticResource ChatTemplate}"
+        ContactTemplate="{StaticResource ContactTemplate}" />
+    </Page.Resources>
     <Grid Background="{StaticResource BgBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="56"/>
@@ -51,52 +187,67 @@
         <!-- =========================================================
              TOP BAR
              ========================================================= -->
-        <Grid Grid.Row="0" Background="{StaticResource TopBarBrush}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="320"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="320"/>
-            </Grid.ColumnDefinitions>
+        <ItemsControl ItemsSource="{x:Bind ViewModel.staffDetails, Mode=OneWay}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="local:StaffLogin">
+                    <!-- Center: title -->
+                    <Grid Grid.Row="0" Background="{StaticResource TopBarBrush}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="320"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="320"/>
+                        </Grid.ColumnDefinitions>
 
-            <!-- Left: status -->
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0" Spacing="10">
-                <Border Width="26" Height="26" CornerRadius="6" Background="{StaticResource TopBarBtnBrush}" VerticalAlignment="Center">
-                    <TextBlock Text="🛰" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14"/>
-                </Border>
+                        <!-- Left: status -->
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0" Spacing="10">
+                            <Border Width="26" Height="26" CornerRadius="6" Background="{StaticResource TopBarBtnBrush}" VerticalAlignment="Center">
+                                <TextBlock Text="🛰" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14"/>
+                            </Border>
 
-                <Ellipse Width="10" Height="10" Fill="{StaticResource OnlineGreenBrush}" VerticalAlignment="Center"/>
-                <TextBlock Text="Online" Foreground="White" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
-            </StackPanel>
+                            <Ellipse Width="10" Height="10" Fill="{StaticResource OnlineGreenBrush}" VerticalAlignment="Center"/>
+                            <TextBlock Text="Online" Foreground="White" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </StackPanel>
 
-            <!-- Center: title -->
-            <TextBlock Grid.Column="1"
-                       Text="Router-SIM Chat"
-                       Foreground="White"
-                       FontSize="20"
-                       FontWeight="SemiBold"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"/>
+                        <!-- Center: title -->
+                        <!--<TextBlock Grid.Column="1"
+               Text="Router-SIM Chat"
+               Foreground="White"
+               FontSize="20"
+               FontWeight="SemiBold"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"/>-->
+                        <TextBlock Grid.Column="1"
+    Text="{x:Bind appsName, Mode=OneWay}"
+    Foreground="White"
+    FontSize="20"
+    FontWeight="SemiBold"
+    HorizontalAlignment="Center"
+    VerticalAlignment="Center"/>
+                        <!-- Right: actions -->
+                        <StackPanel Grid.Column="2"
+                Orientation="Horizontal"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Margin="0,0,12,0"
+                Spacing="8">
+                            <Button Style="{StaticResource TopIconButtonStyle}" Visibility="Collapsed" Content="🔍" />
+                            <Button Style="{StaticResource TopIconButtonStyle}" Visibility="Collapsed"  Content="⚙" />
+                            <Button Style="{StaticResource TopIconButtonStyle}" Visibility="Collapsed"  Content="⛶" />
+                        </StackPanel>
+                    </Grid>
 
-            <!-- Right: actions -->
-            <StackPanel Grid.Column="2"
-                        Orientation="Horizontal"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Center"
-                        Margin="0,0,12,0"
-                        Spacing="8">
-                <Button Style="{StaticResource TopIconButtonStyle}" Content="🔍" />
-                <Button Style="{StaticResource TopIconButtonStyle}" Content="⚙" />
-                <Button Style="{StaticResource TopIconButtonStyle}" Content="⛶" />
-            </StackPanel>
-        </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        
 
         <!-- =========================================================
              MAIN LAYOUT (3 columns)
              ========================================================= -->
         <Grid Grid.Row="1" Margin="16,12,16,16">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="320"/>
-                <ColumnDefinition Width="380"/>
+                <ColumnDefinition Width="{x:Bind ViewModel.FirstColumnWidth, Mode=OneWay}"/>
+                <ColumnDefinition Width="600"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
@@ -107,14 +258,13 @@
                     Background="{StaticResource CardBrush}"
                     BorderBrush="{StaticResource CardBorderBrush}"
                     BorderThickness="1"
-                    CornerRadius="14">
+                    CornerRadius="14" >
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="56"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-
                     <!-- Header -->
                     <Border Background="{StaticResource SubHeaderBrush}" CornerRadius="14,14,0,0">
                         <Grid Padding="16,0">
@@ -128,20 +278,71 @@
                             <Button Grid.Column="1" Style="{StaticResource SoftIconButtonStyle}" Content="＋" />
                         </Grid>
                     </Border>
-
                     <!-- Search -->
                     <Grid Grid.Row="1" Padding="12,10,12,10">
                         <TextBox PlaceholderText="Search router / SIM..."
                                  Height="40"
-                                 BorderBrush="{StaticResource CardBorderBrush}"/>
+                                 BorderBrush="{StaticResource CardBorderBrush}" Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
 
                     <!-- List -->
                     <ScrollViewer Grid.Row="2" Padding="12">
                         <StackPanel Spacing="12">
+                            <ListView ItemsSource="{x:Bind ViewModel.Devices}" SelectionMode="Single" SelectedItem="{x:Bind ViewModel.SelectedDevice, Mode=TwoWay}" IsItemClickEnabled="True"
+    ItemClick="RouterList_ItemClick">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate x:DataType="local:RouteDevice">
+                                        <StackPanel Margin="0,0,0,8">
+                                            <!-- 👈 bottom margin -->
+                                            <Border CornerRadius="12" BorderBrush="#CFE0FF" BorderThickness="1" Background="#F6FAFF">
+                                                <Grid>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                    </Grid.RowDefinitions>
 
+                                                    <Border Background="{x:Bind CardBrush, Mode=OneWay}" CornerRadius="12,12,0,0" Padding="12">
+                                                        <!--<Border Background="{StaticResource AccentBlueBrush}" CornerRadius="12,12,0,0" Padding="12">-->
+                                                        <TextBlock Text="{x:Bind hostname}" Foreground="White" FontWeight="SemiBold" FontSize="16"/>
+                                                    </Border>
+
+                                                    <Grid Grid.Row="1" Padding="12">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <StackPanel Spacing="6">
+                                                            <TextBlock Text="{x:Bind sim}" FontSize="18" FontWeight="SemiBold"/>
+                                                            <TextBlock Text="{x:Bind call_interface}" Foreground="{StaticResource MutedTextBrush}"/>
+                                                        </StackPanel>
+
+                                                        <!--<Border Grid.Column="1" Width="26" Height="26" CornerRadius="13"
+                        Background="{StaticResource OnlineGreenBrush}"
+                        VerticalAlignment="Center">
+                                                            <TextBlock Text="✓" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                        </Border>-->
+                                                        <Border Grid.Column="1"
+                                                                Width="26"
+                                                                Height="26"
+                                                                CornerRadius="13"
+                                                                VerticalAlignment="Center"
+                                                                Background="{x:Bind StatusBrush_color}">
+
+                                                            <TextBlock Text="{x:Bind checkStr}"
+                                                                       Foreground="White"
+                                                                       HorizontalAlignment="Center"
+                                                                       VerticalAlignment="Center"/>
+                                                        </Border>
+                                                    </Grid>
+                                                </Grid>
+                                            </Border>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
                             <!-- Card: selected -->
-                            <Border CornerRadius="12" BorderBrush="#CFE0FF" BorderThickness="1" Background="#F6FAFF">
+                            <!--<Border CornerRadius="12" BorderBrush="#CFE0FF" BorderThickness="1" Background="#F6FAFF">
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
@@ -172,7 +373,7 @@
                                 </Grid>
                             </Border>
 
-                            <!-- Card: offline -->
+                            --><!-- Card: offline --><!--
                             <Border CornerRadius="12" BorderBrush="#E6EAF2" BorderThickness="1" Background="#FBFCFF">
                                 <StackPanel Padding="12" Spacing="6">
                                     <TextBlock Text="HQ9700RTR02" FontWeight="SemiBold" FontSize="16"/>
@@ -182,7 +383,7 @@
                                     </StackPanel>
                                     <TextBlock Text="cellular 1/0/0" Foreground="{StaticResource MutedTextBrush}"/>
                                 </StackPanel>
-                            </Border>
+                            </Border>-->
 
                         </StackPanel>
                     </ScrollViewer>
@@ -214,7 +415,7 @@
                             </Grid.ColumnDefinitions>
 
                             <TextBlock Text="Conversations" VerticalAlignment="Center" Style="{StaticResource SectionTitleStyle}"/>
-                            <Button Grid.Column="1" Style="{StaticResource SoftIconButtonStyle}" Content="⟳" />
+                            <Button Grid.Column="1" Style="{StaticResource SoftIconButtonStyle}" Content="⟳" Click="refreshmsg_click" />
                         </Grid>
                     </Border>
 
@@ -222,38 +423,49 @@
                     <Grid Grid.Row="1" Padding="12,10,12,10">
                         <TextBox PlaceholderText="Search number / name..."
                                  Height="40"
-                                 BorderBrush="{StaticResource CardBorderBrush}"/>
+                                 BorderBrush="{StaticResource CardBorderBrush}" Text="{x:Bind ViewModel.SearchTextMsg, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
-
+                    <ListView Grid.Row="2"
+                      SelectionMode="Single"
+                      ItemsSource="{x:Bind ViewModel.SearchResults}"
+                      ItemTemplateSelector="{StaticResource SearchSelector}"
+                      IsItemClickEnabled="True"
+                      ItemClick="chat_ItemClick"/>
                     <!-- List -->
-                    <ListView Grid.Row="2" Padding="8" SelectionMode="Single">
-                        <ListViewItem>
-                            <Grid Padding="10">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="52"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
+                    <!--<ListView Grid.Row="2" SelectionMode="Single">
+                        <ListView  ItemsSource="{x:Bind ViewModel.LastMessages}" IsItemClickEnabled="True"
+    ItemClick="chat_ItemClick">
+                            <ListView.ItemTemplate>
+                                <DataTemplate x:DataType="local:ChatLastMessage">
+                                    <Grid Padding="10" Background="{x:Bind CardBrush, Mode=OneWay}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="52"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
 
-                                <Border Width="44" Height="44" CornerRadius="22" Background="#DDEBFF">
-                                    <TextBlock Text="👤" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
+                                        <Border Width="44" Height="44" CornerRadius="22" Background="#DDEBFF">
+                                            <TextBlock Text="👤" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
 
-                                <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="4">
-                                    <TextBlock Text="+61452255433" FontWeight="SemiBold"/>
-                                    <TextBlock Text="sent test from 209 (7)" Foreground="{StaticResource MutedTextBrush}" TextTrimming="CharacterEllipsis"/>
-                                </StackPanel>
+                                        <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="4">
+                                            <TextBlock Text="{x:Bind number, Mode=OneWay}" FontWeight="SemiBold"/>
+                                            <TextBlock Text="{x:Bind message, Mode=OneWay}" Foreground="{StaticResource MutedTextBrush}" TextTrimming="CharacterEllipsis"/>
+                                        </StackPanel>
 
-                                <StackPanel Grid.Column="2" HorizontalAlignment="Right" Spacing="6">
-                                    <TextBlock Text="11:38" Foreground="{StaticResource MutedTextBrush}" HorizontalAlignment="Right"/>
-                                    <Border Width="22" Height="22" CornerRadius="11" Background="{StaticResource AccentBlueBrush}" HorizontalAlignment="Right">
-                                        <TextBlock Text="2" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="12"/>
-                                    </Border>
-                                </StackPanel>
-                            </Grid>
-                        </ListViewItem>
+                                        <StackPanel Grid.Column="2" HorizontalAlignment="Right" Spacing="6">
+                                            <TextBlock Text="{x:Bind DisplayTime, Mode=OneWay}" Foreground="{StaticResource MutedTextBrush}" HorizontalAlignment="Right"/>
+                                            <Border Width="22" Height="22" CornerRadius="11" Background="{StaticResource AccentBlueBrush}" HorizontalAlignment="Right" Visibility="{x:Bind UnreadVisibility, Mode=OneWay}">
+                                                <TextBlock Text="{x:Bind unread_count, Mode=OneWay}" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="12"/>
+                                            </Border>
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                        
 
-                        <ListViewItem>
+                        --><!--<ListViewItem>
                             <Grid Padding="10">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="52"/>
@@ -272,8 +484,8 @@
 
                                 <TextBlock Grid.Column="2" Text="10:15" Foreground="{StaticResource MutedTextBrush}" VerticalAlignment="Top"/>
                             </Grid>
-                        </ListViewItem>
-                    </ListView>
+                        </ListViewItem>--><!--
+                    </ListView>-->
                 </Grid>
             </Border>
 
@@ -293,31 +505,36 @@
                     </Grid.RowDefinitions>
 
                     <!-- Chat Header -->
-                    <Grid Grid.Row="0" Background="#FFFFFF" Padding="12">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
+                    <ItemsControl ItemsSource="{x:Bind ViewModel.chatDetails}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="local:ChatLastMessage">
+                                <Grid Grid.Row="0" Background="#FFFFFF" Padding="12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
 
-                        <Button Style="{StaticResource SoftIconButtonStyle}" Content="←"/>
+                                    <Button Style="{StaticResource SoftIconButtonStyle}" Content="←" Click="clearMessage"/>
 
-                        <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
-                            <TextBlock Text="+61452255433" FontSize="18" FontWeight="SemiBold"/>
-                            <TextBlock Text="Using: ALLS205RTR01 • +61452255433" Foreground="{StaticResource MutedTextBrush}" FontSize="12"/>
-                        </StackPanel>
+                                    <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+                                        <TextBlock Text="{x:Bind name, Mode=OneWay}" FontSize="18" FontWeight="SemiBold"/>
+                                        <TextBlock Text="{x:Bind DisplayDetail, Mode=OneWay}" Foreground="{StaticResource MutedTextBrush}" FontSize="12"/>
+                                    </StackPanel>
 
-                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
-                            <Button Style="{StaticResource SoftIconButtonStyle}" Content="📎"/>
-                            <Button Style="{StaticResource SoftIconButtonStyle}" Content="⋯"/>
-                        </StackPanel>
-                    </Grid>
-
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+                                        <Button Grid.Column="2" Content="Open TrackIT Card" Height="34" Margin="10,0,0,0" Background="DarkBlue" Foreground="White" BorderThickness="0" Click="OpenTrackIT_click" Visibility="{x:Bind isTrackITCard, Mode=OneWay}"/>
+                                        <!--<Button Style="{StaticResource SoftIconButtonStyle}" Visibility="Collapsed"  Content="📎"/>
+                                        <Button Style="{StaticResource SoftIconButtonStyle}" Visibility="Collapsed"  Content="⋯"/>-->
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                     <!-- Messages -->
-                    <ScrollViewer Grid.Row="1" Padding="16">
+                    <!--<ScrollViewer Grid.Row="1" Padding="16">
                         <StackPanel Spacing="12">
 
-                            <!-- inbound bubble -->
                             <StackPanel HorizontalAlignment="Left" MaxWidth="560">
                                 <Border Background="{StaticResource BubbleInBrush}" CornerRadius="16" Padding="12">
                                     <TextBlock Text="sent test from 209 (7)" TextWrapping="Wrap"/>
@@ -325,7 +542,6 @@
                                 <TextBlock Text="11:38" Foreground="{StaticResource MutedTextBrush}" FontSize="12" Margin="8,4,0,0"/>
                             </StackPanel>
 
-                            <!-- outbound bubble -->
                             <StackPanel HorizontalAlignment="Right" MaxWidth="560">
                                 <Border Background="{StaticResource AccentBlueBrush}" CornerRadius="16" Padding="12">
                                     <TextBlock Text="Is this agent still online?"
@@ -339,7 +555,6 @@
                                            Margin="0,4,8,0"/>
                             </StackPanel>
 
-                            <!-- inbound bubble -->
                             <StackPanel HorizontalAlignment="Left" MaxWidth="560">
                                 <Border Background="{StaticResource BubbleInBrush}" CornerRadius="16" Padding="12">
                                     <TextBlock Text="Yes, I'm online" TextWrapping="Wrap"/>
@@ -348,7 +563,25 @@
                             </StackPanel>
 
                         </StackPanel>
+                    </ScrollViewer>-->
+                    <ScrollViewer x:Name="ChatScrollViewer" Grid.Row="1" Padding="16">
+                        <ItemsControl ItemsSource="{x:Bind ViewModel.Messages}" ItemTemplateSelector="{StaticResource ChatBubbleTemplateSelector}" />
                     </ScrollViewer>
+                    
+                    <!--<ScrollViewer Grid.Row="1" Padding="16">
+                        <ItemsControl ItemsSource="{x:Bind ViewModel.Messages}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="local:ChatMessage">
+                                    <StackPanel Margin="0,6">
+                                        <TextBlock Text="{x:Bind Message}" />
+                                        <TextBlock Text="{x:Bind Box}" FontSize="12"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>-->
+                    
+
 
                     <!-- Composer -->
                     <Grid Grid.Row="2" Padding="14">
@@ -358,14 +591,14 @@
                             <ColumnDefinition Width="140"/>
                         </Grid.ColumnDefinitions>
 
-                        <Button Width="44" Height="44" Background="#F3F6FF" BorderThickness="0" Content="＋"/>
+                        <!--<Button Width="44" Height="44" Background="#F3F6FF" BorderThickness="0" Visibility="Collapsed"  Content="＋"/>-->
 
                         <TextBox Grid.Column="1"
                                  PlaceholderText="Type a message..."
                                  Height="44"
                                  Margin="10,0,0,0"
                                  VerticalAlignment="Center"
-                                 BorderBrush="{StaticResource CardBorderBrush}"/>
+                                 BorderBrush="{StaticResource CardBorderBrush}" Text="{x:Bind ViewModel.MessageText, Mode=TwoWay}"/>
 
                         <Button Grid.Column="2"
                                 Content="Send"
@@ -373,7 +606,8 @@
                                 Margin="10,0,0,0"
                                 Background="{StaticResource AccentBlueBrush}"
                                 Foreground="White"
-                                BorderThickness="0"/>
+                                BorderThickness="0"
+                                Click="SendButton_click"/>
                     </Grid>
                 </Grid>
             </Border>
