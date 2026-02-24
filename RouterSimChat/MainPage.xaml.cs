@@ -1,23 +1,49 @@
-﻿using Microsoft.UI.Xaml;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Json;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
+using System;
 using System.Collections.Specialized;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace RouterSimChat
 {
     public sealed partial class MainPage : Page
     {
-        public ChatViewModel ViewModel { get; set; } = new ChatViewModel();
+        public ChatViewModel ViewModel { get; set; }
+        public static IConfiguration Configuration { get; private set; }
+
         public MainPage()
         {
+            var builder = new ConfigurationBuilder()
+    .SetBasePath(AppContext.BaseDirectory)
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
+            Configuration = builder.Build();
+
+            var baseUrl = Configuration["ApiSettings:BaseUrl"];
+
+            ViewModel = new ChatViewModel(baseUrl);
             this.InitializeComponent();
             this.DataContext = ViewModel;
             this.Loaded += MainPage_Loaded;
+            ViewModel.RequestScrollToBottom += ScrollToBottom;
         }
+
+        private async void ScrollToBottom()
+        {
+            await Task.Delay(50); // tunggu UI render
+
+            ChatScrollViewer.ChangeView(
+                null,
+                ChatScrollViewer.ScrollableHeight,
+                null);
+        }
+
         private async void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
             await Task.WhenAll(
@@ -120,7 +146,6 @@ namespace RouterSimChat
                 null
             );
         }
-
 
     }
 }

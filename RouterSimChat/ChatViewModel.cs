@@ -30,10 +30,23 @@ namespace RouterSimChat
         private List<StaffLogin> _staffDetails = new();
         private static readonly HttpClient client = new HttpClient();
         private DispatcherTimer _refreshTimer;
+        public event Action RequestScrollToBottom;
+        public ObservableCollection<object> SearchResults { get; set; } = new ObservableCollection<object>();
 
+        //private string _baseUrl;
 
-       public ObservableCollection<object> SearchResults { get; set; }
-    = new ObservableCollection<object>();
+        //public void getBaseUrl(string baseUrl)
+        //{
+        //    _baseUrl = baseUrl?.TrimEnd('/');
+        //}
+        private readonly string _baseUrl;
+
+        public ChatViewModel(string baseUrl)
+        {
+            _baseUrl = baseUrl?
+                .Trim()
+                .TrimEnd('/');
+        }
         private void HandleDeviceChanged()
         {
             if (SelectedDevice?.router_id > 0)
@@ -85,7 +98,7 @@ namespace RouterSimChat
             //    return;
             try
             {
-                //var data = await client.GetFromJsonAsync<List<ChatLastMessage>>($"http://127.0.0.1:8080/api/messages/lastchat?router_id={SelectedDevice.router_id}");
+                //var data = await client.GetFromJsonAsync<List<ChatLastMessage>>($"{_baseUrl}/api/messages/lastchat?router_id={SelectedDevice.router_id}");
 
                 //if (data != null)
                 //{
@@ -109,10 +122,13 @@ namespace RouterSimChat
                 //    }
                 //}
 
-                 var data2 = await client.GetFromJsonAsync<List<ChatMessage>>($"http://127.0.0.1:8080/api/messages/history?router_id={SelectedMsg.router_id}&peer={SelectedMsg.number}&limit=50");
+                var data2 = await client.GetFromJsonAsync<List<ChatMessage>>($"{_baseUrl}/api/messages/history?router_id={SelectedMsg.router_id}&peer={SelectedMsg.number}&limit=50");
                 DateTime? lastDate = null;
                 if (data2 != null)
                 {
+                    DateTime? lastMessageTimeBefore = Messages
+                    .OfType<ChatMessage>()
+                    .LastOrDefault()?.Time;
                     Messages.Clear();
                     foreach (var msg in data2.OrderBy(x => x.Time))
                     {
@@ -134,6 +150,15 @@ namespace RouterSimChat
 
                         Messages.Add(msg);
                     }
+                    var lastMessageTimeAfter = data2
+                    .OrderBy(x => x.Time)
+                    .LastOrDefault()?.Time;
+
+                    if (lastMessageTimeAfter > lastMessageTimeBefore)
+                    {
+                        RequestScrollToBottom?.Invoke();
+                    }
+
                 }
             }
             catch (Exception ex)
@@ -151,7 +176,7 @@ namespace RouterSimChat
         {
             try
             {
-                var data = await client.GetFromJsonAsync<List<ChatLastMessage>>($"http://127.0.0.1:8080/api/messages/lastchatDetail?router_id={router_id}&peer={peer}");
+                var data = await client.GetFromJsonAsync<List<ChatLastMessage>>($"{_baseUrl}/api/messages/lastchatDetail?router_id={router_id}&peer={peer}");
 
                 if (data != null)
                 {
@@ -182,7 +207,7 @@ namespace RouterSimChat
                        
                 }
 
-                var data2 = await client.GetFromJsonAsync<List<ChatMessage>>($"http://127.0.0.1:8080/api/messages/history?router_id={router_id}&peer={peer}&limit=50");
+                var data2 = await client.GetFromJsonAsync<List<ChatMessage>>($"{_baseUrl}/api/messages/history?router_id={router_id}&peer={peer}&limit=50");
                 DateTime? lastDate = null;
                 if (data2 != null)
                 {
@@ -223,7 +248,7 @@ namespace RouterSimChat
             try
             {
                 
-                var data = await client.GetFromJsonAsync<List<ChatLastMessage>>($"http://127.0.0.1:8080/api/messages/lastchat?router_id={deviceId}");
+                var data = await client.GetFromJsonAsync<List<ChatLastMessage>>($"{_baseUrl}/api/messages/lastchat?router_id={deviceId}");
 
                 if (data != null)
                 {
@@ -261,7 +286,7 @@ namespace RouterSimChat
             try
             {
                 string username = Environment.UserName;
-                var data = await client.GetFromJsonAsync<List<StaffLogin>>($"http://127.0.0.1:8080/api/routers/trackit_login?username={username}");
+                var data = await client.GetFromJsonAsync<List<StaffLogin>>($"{_baseUrl}/api/routers/trackit_login?username={username}");
 
                 if (data != null)
                 {
@@ -289,7 +314,7 @@ namespace RouterSimChat
             try
             {
                  
-                var data = await client.GetFromJsonAsync<List<Contact>>($"http://127.0.0.1:8080/api/contact");
+                var data = await client.GetFromJsonAsync<List<Contact>>($"{_baseUrl}/api/contact");
 
                 if (data != null)
                 {
@@ -309,7 +334,7 @@ namespace RouterSimChat
                 return;
             try
             {
-                var data = await client.GetFromJsonAsync<List<ChatLastMessage>>($"http://127.0.0.1:8080/api/messages/lastchat?router_id={SelectedDevice.router_id}");
+                var data = await client.GetFromJsonAsync<List<ChatLastMessage>>($"{_baseUrl}/api/messages/lastchat?router_id={SelectedDevice.router_id}");
                 bool isSorting = false;
 
                 if (data != null)
@@ -438,7 +463,7 @@ namespace RouterSimChat
         {
             try
             {
-                var data = await client.GetFromJsonAsync<List<RouteDevice>>($"http://127.0.0.1:8080/api/routers/device?router_id={deviceId}");
+                var data = await client.GetFromJsonAsync<List<RouteDevice>>($"{_baseUrl}/api/routers/device?router_id={deviceId}");
 
                 if (data != null)
                 {
@@ -624,7 +649,7 @@ namespace RouterSimChat
             {
                 // hit API update
                 await client.PostAsync(
-                    $"http://127.0.0.1:8080/api/messages/mark-read?router_id={item.router_id}&peer={item.number}",
+                    $"{_baseUrl}/api/messages/mark-read?router_id={item.router_id}&peer={item.number}",
                     null);
 
                 // update local UI
@@ -767,7 +792,7 @@ namespace RouterSimChat
                 };
 
                 var response = await client.PostAsJsonAsync(
-                    "http://127.0.0.1:8080/api/send-sms",
+                    "{_baseUrl}/api/send-sms",
                     request);
 
                 if (response.IsSuccessStatusCode)
