@@ -890,7 +890,7 @@ namespace RouterSimChat
                 };
 
                 var response = await client.PostAsJsonAsync(
-                    "{_baseUrl}/api/send-sms",
+                    $"{_baseUrl}/api/send-sms",
                     request);
 
                 if (response.IsSuccessStatusCode)
