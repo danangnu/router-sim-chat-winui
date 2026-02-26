@@ -16,10 +16,59 @@ namespace RouterSimChat
         public string hostname { get; set; } = string.Empty;
         public string call_interface { get; set; }
         public string status { get; set; }
+        private string _statusHeartbeat;
+        public string statusHeartbeat
+        {
+            get => _statusHeartbeat;
+            set
+            {
+                if (_statusHeartbeat != value)
+                {
+                    _statusHeartbeat = value;
+                    OnPropertyChanged(nameof(statusHeartbeat));
+                }
+            }
+        }
         public string sim { get; set; } = string.Empty;
-        public Brush StatusBrush_color { get; set; }
-        public string checkStr { get; set; }
-        public bool isUp { get; set; }
+        private Brush _StatusBrush_color;
+        public Brush StatusBrush_color
+        {
+            get => _StatusBrush_color;
+            set
+            {
+                if (_StatusBrush_color != value)
+                {
+                    _StatusBrush_color = value;
+                    OnPropertyChanged(nameof(StatusBrush_color));
+                }
+            }
+        }
+        private string _checkStr;
+        public string checkStr
+        {
+            get => _checkStr;
+            set
+            {
+                if (_checkStr != value)
+                {
+                    _checkStr = value;
+                    OnPropertyChanged(nameof(checkStr));
+                }
+            }
+        }
+        public DateTime last_heartbeat { get; set; }
+        private bool _isUp;
+        public bool isUp {
+            get => _isUp;
+            set
+            {
+                if (_isUp != value)
+                {
+                    _isUp = value;
+                    OnPropertyChanged(nameof(isUp));
+                }
+            }
+        }
 
         private bool _isActive;
         public bool IsActive
@@ -44,9 +93,7 @@ namespace RouterSimChat
         IsActive
             ? new SolidColorBrush(Colors.DarkBlue)
             : new SolidColorBrush(Colors.DarkGray);
-
-
-
+       
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void OnPropertyChanged(string name)

@@ -1,4 +1,5 @@
-﻿using Microsoft.UI;
+﻿using Microsoft.Toolkit.Uwp.Notifications;
+using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using System;
@@ -12,8 +13,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Chat;
 using Windows.ApplicationModel.Contacts;
+using Windows.Devices.Input;
 using WinRT;
-using Microsoft.Toolkit.Uwp.Notifications;
 
 namespace RouterSimChat
 {
@@ -25,6 +26,7 @@ namespace RouterSimChat
         public List<ChatLastMessage> _allLastMessages = new();
         public ObservableCollection<RouteDevice> Devices { get; set; } = new ObservableCollection<RouteDevice>();
         private List<RouteDevice> _allDevices = new();
+        public ObservableCollection<RouteAgent> Agents { get; set; } = new ObservableCollection<RouteAgent>();
         private List<Contact> _allContacts = new();
         public ObservableCollection<StaffLogin> staffDetails { get; set; } = new ObservableCollection<StaffLogin>();
         private List<StaffLogin> _staffDetails = new();
@@ -75,8 +77,16 @@ namespace RouterSimChat
 
                     try
                     {
+                        
                         await refreshMessagesAsync();
-
+                        if (SelectedDevice?.router_id > 0)
+                        {
+                            await checkRuterAgent(SelectedDevice.router_id);
+                        }
+                        if (DevideStaffID == 0)
+                        {
+                            await checkRouteStatus();
+                        }
                         if (SelectedMsg != null)
                         {
                             await RefreshActiveChatAsync();
@@ -91,7 +101,80 @@ namespace RouterSimChat
 
             _refreshTimer.Start();
         }
+        public async Task checkRouteStatus()
+        {
+            try
+            {
+                var data2 = await client.GetFromJsonAsync<List<RouteDevice>>($"{_baseUrl}/api/routers/device?router_id=0");
 
+                if (data2 != null && data2.Any())
+                {
+                    foreach (var newDevice in data2)
+                    {
+                        var existingDevice = Devices
+                            .FirstOrDefault(x => x.router_id == newDevice.router_id);
+
+                        if (existingDevice != null)
+                        {
+                            // update property dari API
+                            existingDevice.last_heartbeat = newDevice.last_heartbeat;
+                            existingDevice.status = newDevice.status;
+                            existingDevice.hostname = newDevice.hostname;
+
+                            // hitung ulang state
+                            existingDevice.statusHeartbeat =
+                                DateTime.Now - existingDevice.last_heartbeat <= TimeSpan.FromMinutes(2)
+                                    ? "up"
+                                    : "down";
+
+                            existingDevice.StatusBrush_color =
+                                existingDevice.statusHeartbeat == "up"
+                                    ? new SolidColorBrush(Colors.LightGreen)
+                                    : new SolidColorBrush(Colors.Red);
+
+                            existingDevice.checkStr =
+                                existingDevice.statusHeartbeat == "up"
+                                    ? "✓"
+                                    : "";
+
+                            existingDevice.isUp =
+                                existingDevice.statusHeartbeat == "up";
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExceptionHelpers.SetErrorInfo(ex);
+            }
+
+        }
+        private int _staffRouterID = 0;
+        public async Task checkRuterAgent(int deviceId)
+        {
+            try
+            {
+                var data = await client.GetFromJsonAsync<List<RouteAgent>>($"{_baseUrl}/api/routers/agent?router_id={deviceId}");
+
+                if (data != null && data.Any())
+                {
+                    var agent = data.First();
+
+                    foreach (var staff in staffDetails)
+                    {
+                        if (_staffRouterID == agent.router_id)
+                        {
+                            staff.RouteDevice = agent;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExceptionHelpers.SetErrorInfo(ex);
+            }
+
+        }
         public async Task RefreshActiveChatAsync()
         {
             //if (SelectedDevice?.router_id == null)
@@ -295,8 +378,14 @@ namespace RouterSimChat
                     {
                         DevideStaffID = msg.router_id;
                         await LoadContact();
-                        await LoadLastMessagesAsync(msg.router_id);
+                        //await LoadLastMessagesAsync(msg.router_id);
                         await LoadDeviceAsync(msg.router_id);
+
+                        if(msg.route_name == null)
+                        {
+                            msg.route_name = "Administrator";
+                        }
+
                         staffDetails.Add(msg);
                     }
                         
@@ -455,7 +544,7 @@ namespace RouterSimChat
         }
 
         public GridLength FirstColumnWidth =>
-    DevideStaffID > 0
+        DevideStaffID > 0
         ? new GridLength(0)
         : new GridLength(380);
 
@@ -471,14 +560,18 @@ namespace RouterSimChat
                     _allDevices = data;
                     foreach (var dt in data)
                     {
+
                         // hitung brush setelah status di-set
-                        dt.StatusBrush_color = dt.status == "up"
+                        dt.statusHeartbeat = DateTime.Now - dt.last_heartbeat <= TimeSpan.FromMinutes(2)
+                            ? "up"
+                            : "down";
+                        dt.StatusBrush_color = dt.statusHeartbeat == "up"
                             ? new SolidColorBrush(Colors.LightGreen)   // hijau
                             : new SolidColorBrush(Colors.Red);    // merah
-                        dt.checkStr = dt.status == "up"
+                        dt.checkStr = dt.statusHeartbeat == "up"
                             ? "✓"
                             : "";    // merah
-                        dt.isUp = dt.status?.ToLower() == "up";
+                        dt.isUp = dt.statusHeartbeat?.ToLower() == "up";
 
                         Devices.Add(dt);
                     }
@@ -488,6 +581,8 @@ namespace RouterSimChat
                     if (Devices.Any())
                     {
                         SelectedDevice = Devices[0];
+                        await checkRuterAgent(SelectedDevice.router_id);
+                        _staffRouterID = SelectedDevice.router_id;
                     }
                 }
             }
@@ -710,6 +805,7 @@ namespace RouterSimChat
                         _selectedDevice.IsActive = true;
 
                         // 🔥 reload last message berdasarkan router
+                        
                         _ = LoadLastMessagesAsync(_selectedDevice.router_id);
                         HandleDeviceChanged();
                     }
@@ -725,6 +821,8 @@ namespace RouterSimChat
             if (device != null)
             {
                 await LoadLastMessagesAsync(device.router_id);
+                _staffRouterID = device.router_id;
+                await checkRuterAgent(_staffRouterID);
             }
         }
 

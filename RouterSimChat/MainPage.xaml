@@ -204,8 +204,8 @@
                                 <TextBlock Text="🛰" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14"/>
                             </Border>
 
-                            <Ellipse Width="10" Height="10" Fill="{StaticResource OnlineGreenBrush}" VerticalAlignment="Center"/>
-                            <TextBlock Text="Online" Foreground="White" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            <Ellipse Width="10" Height="10" Fill="{x:Bind RouteDevice.isOnline, Mode=OneWay}" VerticalAlignment="Center"/>
+                            <TextBlock Text="{x:Bind RouteDevice.status, Mode=OneWay}" Foreground="White" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         </StackPanel>
 
                         <!-- Center: title -->
@@ -303,7 +303,7 @@
 
                                                     <Border Background="{x:Bind CardBrush, Mode=OneWay}" CornerRadius="12,12,0,0" Padding="12">
                                                         <!--<Border Background="{StaticResource AccentBlueBrush}" CornerRadius="12,12,0,0" Padding="12">-->
-                                                        <TextBlock Text="{x:Bind hostname}" Foreground="White" FontWeight="SemiBold" FontSize="16"/>
+                                                        <TextBlock Text="{x:Bind hostname, Mode=OneWay}" Foreground="White" FontWeight="SemiBold" FontSize="16"/>
                                                     </Border>
 
                                                     <Grid Grid.Row="1" Padding="12">
@@ -313,8 +313,8 @@
                                                         </Grid.ColumnDefinitions>
 
                                                         <StackPanel Spacing="6">
-                                                            <TextBlock Text="{x:Bind sim}" FontSize="18" FontWeight="SemiBold"/>
-                                                            <TextBlock Text="{x:Bind call_interface}" Foreground="{StaticResource MutedTextBrush}"/>
+                                                            <TextBlock Text="{x:Bind sim, Mode=OneWay}" FontSize="18" FontWeight="SemiBold"/>
+                                                            <TextBlock Text="{x:Bind call_interface, Mode=OneWay}" Foreground="{StaticResource MutedTextBrush}"/>
                                                         </StackPanel>
 
                                                         <!--<Border Grid.Column="1" Width="26" Height="26" CornerRadius="13"
@@ -327,9 +327,9 @@
                                                                 Height="26"
                                                                 CornerRadius="13"
                                                                 VerticalAlignment="Center"
-                                                                Background="{x:Bind StatusBrush_color}">
+                                                                Background="{x:Bind StatusBrush_color, Mode=OneWay}">
 
-                                                            <TextBlock Text="{x:Bind checkStr}"
+                                                            <TextBlock Text="{x:Bind checkStr, Mode=OneWay}"
                                                                        Foreground="White"
                                                                        HorizontalAlignment="Center"
                                                                        VerticalAlignment="Center"/>
