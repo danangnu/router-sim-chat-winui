@@ -82,7 +82,7 @@ namespace RouterSimChat
         {
             get
             {
-                if (_cardno == 0)
+                if (_cardno < 1000000)
                 {
                     return Visibility.Collapsed;
                 }

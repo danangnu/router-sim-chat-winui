@@ -716,7 +716,7 @@ namespace RouterSimChat
                     .Where(c =>
                         (c.name.Contains(SearchTextMsg, StringComparison.OrdinalIgnoreCase)
                          || c.contact.Contains(SearchTextMsg))
-                        && !_allLastMessages.Any(l => l.number == c.contact))
+                        && !_allLastMessages.Any(l => NormalizeNumber(l.number) == NormalizeNumber(c.contact)))
                     .ToList();
 
                 foreach (var contact in contacts)
