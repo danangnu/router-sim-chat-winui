@@ -30,9 +30,21 @@ namespace RouterSimChat
         private List<StaffLogin> _staffDetails = new();
         private static readonly HttpClient client = new HttpClient();
         private DispatcherTimer _refreshTimer;
+        private bool _isLoading = true;   // start as loading
+        public bool IsLoading
+        {
+            get => _isLoading;
+            set
+            {
+                if (_isLoading != value)
+                {
+                    _isLoading = value;
+                    OnPropertyChanged(nameof(IsLoading));
+                }
+            }
+        }
 
-
-       public ObservableCollection<object> SearchResults { get; set; }
+        public ObservableCollection<object> SearchResults { get; set; }
     = new ObservableCollection<object>();
         private void HandleDeviceChanged()
         {
@@ -109,7 +121,7 @@ namespace RouterSimChat
                 //    }
                 //}
 
-                 var data2 = await client.GetFromJsonAsync<List<ChatMessage>>($"http://127.0.0.1:8080/api/messages/history?router_id={SelectedMsg.router_id}&peer={SelectedMsg.number}&limit=50");
+                 var data2 = await client.GetFromJsonAsync<List<ChatMessage>>($"http://192.168.205.104:8080/api/messages/history?router_id={SelectedMsg.router_id}&peer={SelectedMsg.number}&limit=50");
                 DateTime? lastDate = null;
                 if (data2 != null)
                 {
@@ -151,7 +163,7 @@ namespace RouterSimChat
         {
             try
             {
-                var data = await client.GetFromJsonAsync<List<ChatLastMessage>>($"http://127.0.0.1:8080/api/messages/lastchatDetail?router_id={router_id}&peer={peer}");
+                var data = await client.GetFromJsonAsync<List<ChatLastMessage>>($"http://192.168.205.104:8080/api/messages/lastchatDetail?router_id={router_id}&peer={peer}");
 
                 if (data != null)
                 {
@@ -182,7 +194,7 @@ namespace RouterSimChat
                        
                 }
 
-                var data2 = await client.GetFromJsonAsync<List<ChatMessage>>($"http://127.0.0.1:8080/api/messages/history?router_id={router_id}&peer={peer}&limit=50");
+                var data2 = await client.GetFromJsonAsync<List<ChatMessage>>($"http://192.168.205.104:8080/api/messages/history?router_id={router_id}&peer={peer}&limit=50");
                 DateTime? lastDate = null;
                 if (data2 != null)
                 {
@@ -223,7 +235,7 @@ namespace RouterSimChat
             try
             {
                 
-                var data = await client.GetFromJsonAsync<List<ChatLastMessage>>($"http://127.0.0.1:8080/api/messages/lastchat?router_id={deviceId}");
+                var data = await client.GetFromJsonAsync<List<ChatLastMessage>>($"http://192.168.205.104:8080/api/messages/lastchat?router_id={deviceId}");
 
                 if (data != null)
                 {
@@ -261,7 +273,7 @@ namespace RouterSimChat
             try
             {
                 string username = Environment.UserName;
-                var data = await client.GetFromJsonAsync<List<StaffLogin>>($"http://127.0.0.1:8080/api/routers/trackit_login?username={username}");
+                var data = await client.GetFromJsonAsync<List<StaffLogin>>($"http://192.168.205.104:8080/api/routers/trackit_login?username={username}");
 
                 if (data != null)
                 {
@@ -289,7 +301,7 @@ namespace RouterSimChat
             try
             {
                  
-                var data = await client.GetFromJsonAsync<List<Contact>>($"http://127.0.0.1:8080/api/contact");
+                var data = await client.GetFromJsonAsync<List<Contact>>($"http://192.168.205.104:8080/api/contact");
 
                 if (data != null)
                 {
@@ -309,7 +321,7 @@ namespace RouterSimChat
                 return;
             try
             {
-                var data = await client.GetFromJsonAsync<List<ChatLastMessage>>($"http://127.0.0.1:8080/api/messages/lastchat?router_id={SelectedDevice.router_id}");
+                var data = await client.GetFromJsonAsync<List<ChatLastMessage>>($"http://192.168.205.104:8080/api/messages/lastchat?router_id={SelectedDevice.router_id}");
                 bool isSorting = false;
 
                 if (data != null)
@@ -438,7 +450,7 @@ namespace RouterSimChat
         {
             try
             {
-                var data = await client.GetFromJsonAsync<List<RouteDevice>>($"http://127.0.0.1:8080/api/routers/device?router_id={deviceId}");
+                var data = await client.GetFromJsonAsync<List<RouteDevice>>($"http://192.168.205.104:8080/api/routers/device?router_id={deviceId}");
 
                 if (data != null)
                 {
@@ -624,7 +636,7 @@ namespace RouterSimChat
             {
                 // hit API update
                 await client.PostAsync(
-                    $"http://127.0.0.1:8080/api/messages/mark-read?router_id={item.router_id}&peer={item.number}",
+                    $"http://192.168.205.104:8080/api/messages/mark-read?router_id={item.router_id}&peer={item.number}",
                     null);
 
                 // update local UI
@@ -767,7 +779,7 @@ namespace RouterSimChat
                 };
 
                 var response = await client.PostAsJsonAsync(
-                    "http://127.0.0.1:8080/api/send-sms",
+                    "http://192.168.205.104:8080/api/send-sms",
                     request);
 
                 if (response.IsSuccessStatusCode)
